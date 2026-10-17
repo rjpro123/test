@@ -1,0 +1,6 @@
+{
+  "name": "DiskSize AI",
+  "description": "Expert system utility for disk storage analysis, visual folder trees, WinDirStat-style treemaps, and safe storage cleanup across Windows, macOS, and Linux.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
