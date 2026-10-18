@@ -9,10 +9,10 @@ export interface PresetProfile {
   rootNode: DiskNode;
 }
 
-// 1. Windows 11 NVMe SSD (512 GB)
+// 1. Windows 11 NVMe SSD (512 GB) - C: Drive
 const windowsScan: DiskNode = {
   id: 'win-c',
-  name: 'OS (C:)',
+  name: 'Local Disk (C:)',
   path: 'C:\\',
   size: 388705000000, // ~362 GB
   isDirectory: true,
@@ -739,8 +739,135 @@ const linuxScan: DiskNode = {
   ],
 };
 
-export const PRESET_PROFILES: Record<OperatingSystem, PresetProfile> = {
-  windows: {
+// Windows 11 Secondary Drive (D: Data & Games - 1 TB)
+const windowsScanD: DiskNode = {
+  id: 'win-d',
+  name: 'Data (D:)',
+  path: 'D:\\',
+  size: 512400000000, // ~477 GB used
+  isDirectory: true,
+  fileCount: 184500,
+  dirCount: 14200,
+  category: 'games',
+  safetyRating: 'caution',
+  children: [
+    {
+      id: 'win-d-steam',
+      name: 'SteamLibrary',
+      path: 'D:\\SteamLibrary',
+      size: 248000000000, // 230 GB
+      isDirectory: true,
+      category: 'games',
+      safetyRating: 'caution',
+      fileCount: 48900,
+      children: [
+        {
+          id: 'win-d-steam-cp2077',
+          name: 'steamapps\\common\\Cyberpunk 2077',
+          path: 'D:\\SteamLibrary\\steamapps\\common\\Cyberpunk 2077',
+          size: 84000000000,
+          isDirectory: true,
+          category: 'games',
+          safetyRating: 'caution',
+        },
+        {
+          id: 'win-d-steam-starfield',
+          name: 'steamapps\\common\\Starfield',
+          path: 'D:\\SteamLibrary\\steamapps\\common\\Starfield',
+          size: 138000000000,
+          isDirectory: true,
+          category: 'games',
+          safetyRating: 'caution',
+        },
+        {
+          id: 'win-d-steam-downloading',
+          name: 'steamapps\\downloading',
+          path: 'D:\\SteamLibrary\\steamapps\\downloading',
+          size: 26000000000, // 24.2 GB leftover downloads
+          isDirectory: true,
+          category: 'caches',
+          safetyRating: 'safe',
+          safetyReason: 'Leftover temporary game update chunk files. Safe to clear.',
+        },
+      ],
+    },
+    {
+      id: 'win-d-wsl',
+      name: 'WSL2 & Containers',
+      path: 'D:\\WSL',
+      size: 78500000000, // ~73 GB
+      isDirectory: true,
+      category: 'developer',
+      safetyRating: 'caution',
+      children: [
+        {
+          id: 'win-d-ext4-vhdx',
+          name: 'Ubuntu\\ext4.vhdx',
+          path: 'D:\\WSL\\Ubuntu\\ext4.vhdx',
+          size: 52400000000, // 48.8 GB
+          isDirectory: false,
+          category: 'developer',
+          safetyRating: 'caution',
+          safetyReason: 'WSL2 virtual disk. Grows dynamically. Can be shrunk via diskpart compact vdisk.',
+        },
+        {
+          id: 'win-d-docker-wsl',
+          name: 'Docker\\docker-desktop-data.vhdx',
+          path: 'D:\\WSL\\Docker\\docker-desktop-data.vhdx',
+          size: 26100000000,
+          isDirectory: false,
+          category: 'developer',
+          safetyRating: 'caution',
+          safetyReason: 'Docker WSL backend virtual disk. Clean via docker system prune -a --volumes.',
+        },
+      ],
+    },
+    {
+      id: 'win-d-obs',
+      name: 'Recordings & Captures (OBS)',
+      path: 'D:\\Recordings',
+      size: 94200000000, // ~87 GB
+      isDirectory: true,
+      category: 'media',
+      safetyRating: 'caution',
+      fileCount: 420,
+    },
+    {
+      id: 'win-d-archives',
+      name: 'Backups & ISOs',
+      path: 'D:\\Backups',
+      size: 91700000000, // ~85 GB
+      isDirectory: true,
+      category: 'archives',
+      safetyRating: 'caution',
+      children: [
+        {
+          id: 'win-d-windows-iso',
+          name: 'Win11_24H2_English_x64.iso',
+          path: 'D:\\Backups\\Win11_24H2_English_x64.iso',
+          size: 6400000000,
+          isDirectory: false,
+          category: 'archives',
+          safetyRating: 'safe',
+          safetyReason: 'Setup ISO downloaded 6 months ago. Safe to delete if not needed.',
+        },
+        {
+          id: 'win-d-old-zip',
+          name: 'Old-PC-AppData-Backup.zip',
+          path: 'D:\\Backups\\Old-PC-AppData-Backup.zip',
+          size: 38400000000,
+          isDirectory: false,
+          category: 'archives',
+          safetyRating: 'safe',
+          safetyReason: 'Old migration zip file from past PC setup.',
+        },
+      ],
+    },
+  ],
+};
+
+export const PRESET_PROFILES: Record<string, PresetProfile> = {
+  'windows-c': {
     id: 'windows-c',
     os: 'windows',
     driveLabel: 'Local Disk (C:)',
@@ -748,20 +875,37 @@ export const PRESET_PROFILES: Record<OperatingSystem, PresetProfile> = {
     freeSpace: 123405190592, // ~114 GB free
     rootNode: windowsScan,
   },
-  macos: {
+  'windows-d': {
+    id: 'windows-d',
+    os: 'windows',
+    driveLabel: 'Data Disk (D:)',
+    totalCapacity: 1000204886016, // 1 TB
+    freeSpace: 487804886016, // ~454 GB free
+    rootNode: windowsScanD,
+  },
+  'windows': {
+    id: 'windows-c',
+    os: 'windows',
+    driveLabel: 'Local Disk (C:)',
+    totalCapacity: 512110190592,
+    freeSpace: 123405190592,
+    rootNode: windowsScan,
+  },
+  'macos': {
     id: 'mac-hd',
     os: 'macos',
-    driveLabel: 'Macintosh HD (APFS Container)',
-    totalCapacity: 500277790720, // 500 GB
-    freeSpace: 104877790720, // ~97 GB free
+    driveLabel: 'Macintosh HD',
+    totalCapacity: 500277790720,
+    freeSpace: 104877790720,
     rootNode: macScan,
   },
-  linux: {
+  'linux': {
     id: 'linux-nvme',
     os: 'linux',
-    driveLabel: 'NVMe rootfs (ext4)',
-    totalCapacity: 256060514304, // 256 GB
-    freeSpace: 57560514304, // ~53 GB free
+    driveLabel: 'Linux rootfs (/)',
+    totalCapacity: 256060514304,
+    freeSpace: 57560514304,
     rootNode: linuxScan,
   },
 };
+
